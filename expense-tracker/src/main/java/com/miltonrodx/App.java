@@ -11,12 +11,23 @@ public class App {
                     Expense.viewAll();
                 } else if (args[0].equals("summary")) {
                     Expense.summary();
+                } else if (args[0].equals("add")) {// if he did it wrong
+                    System.out.println("Usage: add <description> <amount>");
                 }
                 break;
         
             case 2:
                 if (args[0].equals("summary") && NumberUtils.isCreatable(args[1])) { // if second argument can be numeric
                     Expense.summary(NumberUtils.toInt(args[1])); // summary of that month
+                }
+                else if (args[0].equals("add")) {
+                    System.out.println("Usage: add <description> <amount>");
+                } else if (args[0].equals("update")){
+                    System.out.println("Usage: update <id> <new-description> <new-amount>");
+                } else if (args[0].equals("delete") &&
+                        NumberUtils.isCreatable(args[1])) {
+                    int id = NumberUtils.toInt(args[1]);
+                    Expense.delete(id);
                 }
 
                 break;
@@ -25,8 +36,10 @@ public class App {
                 if (args[0].equals("add")) { // ADD
                     try {
                         if ((args[1] instanceof String) &&
+                            (args[2] != null) &&
                             (NumberUtils.isCreatable(args[2]))) {    // boolean isConvertible = NumberUtils.isCreatable(str);
-                            Expense.add(args[1], Double.parseDouble(args[2]));
+                            double amount = Double.parseDouble(args[2]);
+                            Expense.add(args[1], amount);
                         }
                         else if ((NumberUtils.isCreatable(args[1])) &&
                             (args[2] instanceof String)) {
@@ -50,10 +63,10 @@ public class App {
                         if (NumberUtils.isCreatable(args[2])) { // if there is  description and ID
                             Expense.update(NumberUtils.toInt(args[2]), pId);
                         }
-                        else if (args[2] instanceof String) { // if there is  ID and description  
+                        else if (args[2] instanceof String) { // if there is  ID and description   // there is a BUG: TODO Fix bug 
                             Expense.update(NumberUtils.toInt(args[1]), args[2]);
                         } 
-                        else if (args[2] instanceof String) { // if there is string description
+                        else if (args[2] instanceof String) { // if there is only description
                             Expense.update(pId, args[2]);
                         }
                         else if (NumberUtils.isCreatable(args[2])) { // if there is double amount
@@ -80,7 +93,7 @@ public class App {
                 
                 break;
 
-                
+
             default:
                 if (args.length == 0) {
                     System.out.println("Invoke the tool using arguments. for example add <description> <amount>, etc");
