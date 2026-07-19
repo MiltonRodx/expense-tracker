@@ -3,106 +3,106 @@ package com.miltonrodx;
 import org.apache.commons.lang3.math.NumberUtils;
 
 public class App {
-    public static void main(String[] args) throws Exception {
-        
-        switch (args.length) {
-            case 1:
-                if (args[0].equals("view-all")) {
-                    Expense.viewAll();
-                } else if (args[0].equals("summary")) {
-                    Expense.summary();
-                } else if (args[0].equals("add")) {// if he did it wrong
-                    System.out.println("Usage: add <description> <amount>");
-                }
-                break;
-        
-            case 2:
-                if (args[0].equals("summary") && NumberUtils.isCreatable(args[1])) { // if second argument can be numeric
-                    Expense.summary(NumberUtils.toInt(args[1])); // summary of that month
-                }
-                else if (args[0].equals("add")) {
-                    System.out.println("Usage: add <description> <amount>");
-                } else if (args[0].equals("update")){
-                    System.out.println("Usage: update <id> <new-description> <new-amount>");
-                } else if (args[0].equals("delete") &&
-                        NumberUtils.isCreatable(args[1])) {
-                    int id = NumberUtils.toInt(args[1]);
-                    Expense.delete(id);
-                }
+    public static void main(String[] args) throws Exception{
+        if (args.length == 0) {
+            System.out.println("Invoke the tool using arguments. for example add <description> <amount>, etc");
+        }
+        else {
+            String command = args[0];
 
-                break;
-
-            case 3:
-                if (args[0].equals("add")) { // ADD
-                    try {
-                        if ((args[1] instanceof String) &&
-                            (args[2] != null) &&
-                            (NumberUtils.isCreatable(args[2]))) {    // boolean isConvertible = NumberUtils.isCreatable(str);
-                            double amount = Double.parseDouble(args[2]);
-                            Expense.add(args[1], amount);
-                        }
-                        else if ((NumberUtils.isCreatable(args[1])) &&
-                            (args[2] instanceof String)) {
-                            Expense.add(args[2], Double.parseDouble(args[1]));
-                        } else {
-                            System.out.println("You must provide a description(text) and amount(numeric) as arguments to add an expense");
-                        }
-
-                    } catch (Exception e) { // exception
-                        e.printStackTrace();
+            switch (command) {
+                case "add":
+                    // get values to readable
+                    if (args[1] != "--description" || args[3] != "--amount") {
+                        System.out.println("Usage: add --description <description> --amount <amount>");
                     }
 
-                } else if (args[0].equals("update")) { // update
-                    try {
-                        int pId;
+                    if (NumberUtils.isCreatable(args[4])) {
+                        String description = args[2];
+                        Double amount = NumberUtils.toDouble(args[4]);
 
-                        if (NumberUtils.isCreatable(args[1])) {
-                            pId = NumberUtils.toInt(args[1]);
-                        } else break;
-
-                        if (NumberUtils.isCreatable(args[2])) { // if there is  description and ID
-                            Expense.update(NumberUtils.toInt(args[2]), pId);
-                        }
-                        else if (args[2] instanceof String) { // if there is  ID and description   // there is a BUG: TODO Fix bug 
-                            Expense.update(NumberUtils.toInt(args[1]), args[2]);
-                        } 
-                        else if (args[2] instanceof String) { // if there is only description
-                            Expense.update(pId, args[2]);
-                        }
-                        else if (NumberUtils.isCreatable(args[2])) { // if there is double amount
-                            Expense.update(pId, NumberUtils.toDouble(args[2]));
-                        }
-                    } catch (Exception e) { // exception
-                        e.printStackTrace();
+                        Expense.add(description, amount);
+                    } else {
+                        System.out.println("Amount provided must be numeric.");
                     }
-                }
+                    break;
+            
 
-                break;
+                case "update":
 
-            case 4:
-                if (args[0].equals("update") &&
-                    NumberUtils.isCreatable(args[1]) &&
-                    (args[2] instanceof String) &&
-                    (NumberUtils.isCreatable(args[3]))) {
+                    if (args[1].equals("--id") &&
+                        NumberUtils.isCreatable(args[2]) &&
+                        args[3].equals("--description") &&
+                        args[4] != null &&
+                        args[5].equals("--amount") &&
+                        NumberUtils.isCreatable(args[6])) {
 
-                        int id = NumberUtils.toInt(args[1]);
-                        double amount = NumberUtils.toDouble(args[3]);
+                            int id = NumberUtils.toInt(args[2]);
+                            double amount = NumberUtils.toDouble(args[6]);
+                            Expense.update(id, args[4], amount);
+                    
+                    }
+                    else if (args[1].equals("--id") &&
+                            NumberUtils.isCreatable(args[2]) &&
+                            args[3].equals("--description") &&
+                            args[4] != null) {
+                            
+                            int id = NumberUtils.toInt(args[2]);
+                            Expense.update(id, args[4]);
+                    }
+                    else if (args[1].equals("--id") &&
+                            NumberUtils.isCreatable(args[2]) &&
+                            args[3].equals("--amount") &&
+                            NumberUtils.isCreatable(args[4])) {
+                            
+                            int id = NumberUtils.toInt(args[2]);
+                            double amount = NumberUtils.toDouble(args[6]);
+                            Expense.update(id, amount);
+                    } else {
+                        System.out.println("Usage: update --id <id> --description <description>    or");
+                        System.out.println("update --id <id> --amount <amount>");
+                        System.out.println("Or both at the same time.");
+                    }
+                        
+                    break;
 
-                        Expense.update(id, args[2], amount);
-                }
+                case "delete":
+                    if (args[1].equals("--id") &&
+                        NumberUtils.isCreatable(args[2])) {
+                            int id = NumberUtils.toInt(args[2]);
+                            Expense.delete(id);
+                    } else {
+                        System.out.println("Usage: delete --id <id>");
+                    }
+                    break;
+
+                case "list":
+                    if (args.length == 1) {
+                        Expense.list();
+                    } else {
+                        System.out.println("Usage: list");
+                    }
+                    break;
                 
-                break;
+                case "summary":
+                    if (args[1] == null) {
+                        Expense.summary();
+                    }
+                    else if (args[2].equals("--month") &&
+                            NumberUtils.isCreatable(args[3])) {
+                            int id = NumberUtils.toInt(args[3]);
+                            Expense.summary(id);
+                    } else {
+                        System.out.println("Usage: summary");
+                        System.out.println("Usage: summary --month <number between 1 and 12>");
+                    }
+                     break;
 
+                default:
+                    System.out.println("Commands available are: add, update, delete, list, summary");
+                    break;
+            }
 
-            default:
-                if (args.length == 0) {
-                    System.out.println("Invoke the tool using arguments. for example add <description> <amount>, etc");
-                }
-                else if (args.length > 4) {
-                    System.out.println("Too many arguments!");
-                }
-
-                break;
         }
         
     }

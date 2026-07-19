@@ -436,9 +436,40 @@ public class Expense {
 
 
 
-    // VIEWALL
-    public static void viewAll () {
+    // List
+    public static void list () {
+        try {
+            // reader object
+            Reader reader = new FileReader(FILEPATH); 
+
+            // Create CSVFormat instance
+            CSVFormat format = CSVFormat.DEFAULT.builder() // create csvformat
+                .setHeader()    // lee encabezados automaticamente leyendo
+                .setSkipHeaderRecord(true) // ignore first line
+                .get();
         
+            // create CSVParser instance (original)
+            CSVParser parser = CSVParser.parse(reader, format);
+
+            // create iterable record (looping over original file)
+            Iterable<CSVRecord> records = parser; // assign parser to the interface
+
+            System.out.println("-------| Expenses |-------");
+            System.out.println("# ID Date       Description      Amount");
+            for (CSVRecord record : records) {
+                System.out.println(
+                    "# " +
+                    record.get("id") + " " +
+                    record.get("date") + "  " +
+                    record.get("description") + "  " +
+                    record.get("amount")
+                );    
+            }
+
+        } catch (Exception e) {
+            // TODO: handle exception
+            System.err.println("Error while reading CSV File: " + e.getMessage());
+        }
     }
 
 
