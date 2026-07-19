@@ -374,7 +374,7 @@ public class Expense {
             Reader originalReader = new FileReader(FILEPATH);
 
             // Create writers (temp and original)
-            FileWriter originalWriter = new FileWriter(FILEPATH, true); // make it to the iru
+            FileWriter originalWriter = new FileWriter(FILEPATH, true);
             FileWriter tempWriter = new FileWriter(tempPath, true);
 
             // Create CSVFormat instance
@@ -396,14 +396,17 @@ public class Expense {
             boolean wasFound = false;
             String strId = String.valueOf(pId);
 
+            // print header!!!!!!
+            tempPrinter.printRecord("id", "description", "amount", "date");
+
             // (2) Loop and do stuff
             for (CSVRecord record : originalRecords) {
-                if (record.get("id").equals(strId)) {
+                if (!wasFound && record.get("id").equals(strId)) {
                     wasFound = true;
                     continue;
+                } else {
+                    tempPrinter.printRecord(record);
                 }
-
-                tempPrinter.printRecord(record);
             }
 
             if (!wasFound) {
@@ -415,8 +418,11 @@ public class Expense {
             Path tempFile = Paths.get(tempPath);
 
             Files.move(tempFile, origFile, StandardCopyOption.REPLACE_EXISTING);  //writing to file
-            
-            System.out.println("Record with id " + strId + " was deleted succesfully.");
+
+            if (wasFound){
+                System.out.println("Record with id " + strId + " was deleted succesfully.");
+            }
+                
 
             // close printers
             tempPrinter.close();
