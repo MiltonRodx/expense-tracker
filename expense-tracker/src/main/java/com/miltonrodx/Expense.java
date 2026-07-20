@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-
+import de.vandermeer.asciitable.AsciiTable;
 
 public class Expense {
     // Attributes
@@ -439,6 +439,10 @@ public class Expense {
     // List
     public static void list () {
         try {
+            // AsciiTable Library:
+            AsciiTable table = new AsciiTable();
+            
+            
             // reader object
             Reader reader = new FileReader(FILEPATH); 
 
@@ -454,17 +458,17 @@ public class Expense {
             // create iterable record (looping over original file)
             Iterable<CSVRecord> records = parser; // assign parser to the interface
 
-            System.out.println("-------| Expenses |-------");
-            System.out.println("# ID Date       Description      Amount");
+
+
+            table.addRow("Id", "Date", "Description", "Amount");
+            
             for (CSVRecord record : records) {
-                System.out.println(
-                    "# " +
-                    record.get("id") + " " +
-                    record.get("date") + "  " +
-                    record.get("description") + "  " +
-                    record.get("amount")
-                );    
+                table.addRow(record.get("id"), record.get("date"), record.get("description"), record.get("amount"));    
             }
+
+            // print to console.
+            String renderedTable = table.render();
+            System.out.println(renderedTable);
 
         } catch (Exception e) {
             System.err.println("Error while reading CSV File: " + e.getMessage());
