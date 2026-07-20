@@ -11,9 +11,9 @@ public class App {
             String command = args[0];
 
             switch (command) {
-                case "add":
+                case "add": // add --description <description> --amount <amount>   length = 5
                     // get values to readable
-                    if (args[1] != "--description" || args[3] != "--amount") {
+                    if (args.length != 5 || !args[1].equals("--description") || !args[3].equals("--amount")) {
                         System.out.println("Usage: add --description <description> --amount <amount>");
                     }
 
@@ -30,7 +30,7 @@ public class App {
 
                 case "update":
 
-                    if (args[1].equals("--id") &&
+                    if (args.length == 7 && args[1].equals("--id") &&  // update --id <id> --description <description> --amount <amount>    7 args
                         NumberUtils.isCreatable(args[2]) &&
                         args[3].equals("--description") &&
                         args[4] != null &&
@@ -42,7 +42,8 @@ public class App {
                             Expense.update(id, args[4], amount);
                     
                     }
-                    else if (args[1].equals("--id") &&
+                    else if (args.length == 5 &&
+                            args[1].equals("--id") &&
                             NumberUtils.isCreatable(args[2]) &&
                             args[3].equals("--description") &&
                             args[4] != null) {
@@ -50,13 +51,14 @@ public class App {
                             int id = NumberUtils.toInt(args[2]);
                             Expense.update(id, args[4]);
                     }
-                    else if (args[1].equals("--id") &&
+                    else if (args.length == 5 &&
+                            args[1].equals("--id") &&
                             NumberUtils.isCreatable(args[2]) &&
                             args[3].equals("--amount") &&
                             NumberUtils.isCreatable(args[4])) {
                             
                             int id = NumberUtils.toInt(args[2]);
-                            double amount = NumberUtils.toDouble(args[6]);
+                            double amount = NumberUtils.toDouble(args[4]);
                             Expense.update(id, amount);
                     } else {
                         System.out.println("Usage: update --id <id> --description <description>    or");
@@ -67,7 +69,8 @@ public class App {
                     break;
 
                 case "delete":
-                    if (args[1].equals("--id") &&
+                    if (args.length == 3 && 
+                        args[1].equals("--id") &&
                         NumberUtils.isCreatable(args[2])) {
                             int id = NumberUtils.toInt(args[2]);
                             Expense.delete(id);
@@ -85,12 +88,12 @@ public class App {
                     break;
                 
                 case "summary":
-                    if (args[1] == null) {
+                    if (args.length == 1) {
                         Expense.summary();
                     }
-                    else if (args[2].equals("--month") &&
-                            NumberUtils.isCreatable(args[3])) {
-                            int id = NumberUtils.toInt(args[3]);
+                    else if (args.length == 3 && args[1].equals("--month") && // summary --month <id>
+                            NumberUtils.isCreatable(args[2])) {
+                            int id = NumberUtils.toInt(args[2]);
                             Expense.summary(id);
                     } else {
                         System.out.println("Usage: summary");

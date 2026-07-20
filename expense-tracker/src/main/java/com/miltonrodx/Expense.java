@@ -467,7 +467,6 @@ public class Expense {
             }
 
         } catch (Exception e) {
-            // TODO: handle exception
             System.err.println("Error while reading CSV File: " + e.getMessage());
         }
     }
@@ -478,7 +477,40 @@ public class Expense {
     // SUMMARY      (2 cases)
     // summary in case no args:    summary of actual month
     public static void summary () {
-        // basically is show in screen amount of money current month
+        // basically this is show in screen amount of money wasted in current month
+        
+        try {
+            
+            
+            // reader object
+            Reader reader = new FileReader(FILEPATH); 
+
+            // Create CSVFormat instance
+            CSVFormat format = CSVFormat.DEFAULT.builder() // create csvformat
+                .setHeader()    // lee encabezados automaticamente leyendo
+                .setSkipHeaderRecord(true) // ignore first line
+                .get();
+        
+            // create CSVParser instance (original)
+            CSVParser parser = CSVParser.parse(reader, format);
+
+            // create iterable record (looping over original file)
+            Iterable<CSVRecord> records = parser; // assign parser to the interface
+
+            double totalAmount = 0;
+            
+            for (CSVRecord record : records) {
+                String aux = record.get("amount");
+                double amount = Double.parseDouble(aux); // using native thing check this, will leave it here without catch
+
+                totalAmount += amount;
+            }
+
+            System.out.println("# Total expenses: $" + totalAmount);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -488,6 +520,56 @@ public class Expense {
     // in case there is a specified month (of current year if exists, else previous year if exists).
     public static void summary (int pId) {
         // check if pId is integer and not cero and if it is between 1 and 12 both included.
+        // crap: int actualMonth = NumberUtils.toInt(Utils.returnDate("MM")); // get actual date
 
+        int actualYear = Integer.parseInt(Utils.returnDate("yyyy"));  // call tool to get actualYear
+
+
+        if (pId < 1 || pId > 12) {
+            System.out.println("Month provided must be between 1 and 12.");
+        }
+
+        else { // if actualMonth is in range
+            try {
+                // reader object
+                Reader reader = new FileReader(FILEPATH); 
+
+                // Create CSVFormat instance
+                CSVFormat format = CSVFormat.DEFAULT.builder() // create csvformat
+                    .setHeader()    // lee encabezados automaticamente leyendo
+                    .setSkipHeaderRecord(true) // ignore first line
+                    .get();
+                    
+                // create CSVParser instance (original)
+                CSVParser parser = CSVParser.parse(reader, format);
+
+                // create iterable record (looping over original file)
+                Iterable<CSVRecord> records = parser; // assign parser to the interface
+
+                double totalAmountMonthly = 0;
+                
+                for (CSVRecord record : records) {
+                    // get month
+                    String date  = record.get("date");// get date
+                    String month = date.substring(8);
+                    int recordMonth = Integer.parseInt(month);
+                    String year = date.substring(0, 4);
+                    int thisYear = Integer.parseInt(year);
+                    
+                    // slice the year and check if the year is the same as actualYear
+
+                    if (recordMonth == pId && thisYear == actualYear) {
+                        // now count that money
+                        double amount = Double.parseDouble(record.get("amount"));
+                        totalAmountMonthly += amount;
+                    }
+                }
+
+                System.out.println("# Total expenses: $" + totalAmountMonthly);
+
+            } catch (Exception e) {
+                System.err.println("Error: " + e.getMessage());
+            }
+        }
     }
 }
